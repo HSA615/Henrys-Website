@@ -1151,7 +1151,7 @@
         </div>
         <div class="input-area" id="inputArea">
             <div class="input-row" id="inputRow">
-                <textarea id="chatInput" rows="1" placeholder="Ask me anything..." maxlength="100000" onkeydown="handleInputKeydown(event)" onkeyup="handleInputKeydown(event)" oninput="autoResizeTextarea()"></textarea>
+                <textarea id="chatInput" rows="1" placeholder="Ask me anything..." maxlength="100000" oninput="autoResizeTextarea()"></textarea>
                 <button type="button" class="btn btn-ghost" id="searchBtn" onclick="searchAndSend()" title="Search">🔎</button>
                 <button type="button" class="btn btn-accent btn-send" id="sendBtn" onclick="sendMessage()" title="Send">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
@@ -1481,11 +1481,11 @@
             }
 
             function handleInputKeydown(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    sendMessage();
-                }
+                const isEnterKey = e.key === 'Enter' || e.keyCode === 13 || e.code === 'Enter' || e.code === 'NumpadEnter';
+                if (e.isComposing || e.defaultPrevented || !isEnterKey || e.shiftKey) return;
+                e.preventDefault();
+                e.stopPropagation();
+                sendMessage();
             }
 
             async function sendMessage() {
@@ -1888,7 +1888,9 @@
                 }
                 ma.classList.remove('drop-zone-highlight');
             });
-            document.getElementById('chatInput').addEventListener('input', updateInputStats);
+            const chatInput = document.getElementById('chatInput');
+            chatInput.addEventListener('keydown', handleInputKeydown);
+            chatInput.addEventListener('input', updateInputStats);
             loadState();
             applyTheme();
             renderAll();
