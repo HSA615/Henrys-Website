@@ -1175,7 +1175,7 @@
             </div>
             <div class="form-group">
                 <label>Image API Key (optional)</label>
-                <input type="password" id="settingImageApiKey" placeholder="Gemini / Google AI Studio key" autocomplete="off">
+                <input type="password" id="settingImageApiKey" placeholder="Hugging Face key" autocomplete="off">
             </div>
             <div class="form-group">
                 <label>Model</label>
@@ -1551,39 +1551,34 @@
                 updateSendStopButtons();
 
                 try {
-                    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${encodeURIComponent(imageKey)}`, {
+                    const resp = await fetch('https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                            generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
-                        }),
+                        headers: {
+                            'Authorization': `Bearer ${imageKey}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ inputs: prompt }),
                         signal: state.abortController?.signal
                     });
 
-                    const data = await resp.json();
                     if (!resp.ok) {
-                        conv.messages[aiIdx].content = 'Image generation failed: ' + (data.error?.message || resp.statusText || 'Unknown error');
+                        const errText = await getErrorMessage(resp, resp.statusText || 'Unknown error');
+                        conv.messages[aiIdx].content = 'Image generation failed: ' + errText;
                         saveConversations();
                         renderChat();
                         return;
                     }
 
-                    const parts = data.candidates?.[0]?.content?.parts || [];
-                    let text = '';
-                    let imageDataUrl = '';
-                    parts.forEach(part => {
-                        if (part.text) text += part.text;
-                        if (part.inlineData?.mimeType && part.inlineData?.data) {
-                            imageDataUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                        }
-                    });
-
-                    conv.messages[aiIdx].content = text || 'Image generated.';
-                    conv.messages[aiIdx].imageDataUrl = imageDataUrl;
-                    conv.updatedAt = Date.now();
-                    saveConversations();
-                    renderChat();
+                    const blob = await resp.blob();
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        conv.messages[aiIdx].content = 'Image generated.';
+                        conv.messages[aiIdx].imageDataUrl = reader.result;
+                        conv.updatedAt = Date.now();
+                        saveConversations();
+                        renderChat();
+                    };
+                    reader.readAsDataURL(blob);
                 } catch (err) {
                     conv.messages[aiIdx].content = 'Image generation error: ' + err.message;
                     saveConversations();
