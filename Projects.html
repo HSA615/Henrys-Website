@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explore Henry Alberts' projects, including ArtifactStory, robotics, and website work.">
+  <meta property="og:title" content="Projects | Henrys Website">
+  <meta property="og:description" content="Explore Henry Alberts' projects, including ArtifactStory, robotics, and website work.">
+  <link rel="icon" type="image/png" sizes="1000x1000" href="images/Favicon.png">
+  <title>Projects | Henrys Website</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="site.js"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <div class="particle-field" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <header class="site-nav">
+      <a class="brand" href="index.html">Henry Alberts</a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a class="nav-link" href="index.html">Home</a>
+        <a class="nav-link current" href="Projects.html" aria-current="page">Projects</a>
+        <a class="nav-link" href="TechTips.html">Tech Tips</a>
+        <a class="nav-link" href="MyFavoriteMusic.html">Music</a>
+        <a class="action-link" href="https://www.youtube.com/@GottaGoTech" target="_blank" rel="noreferrer">YouTube</a>
+        <a class="nav-link" href="ContactPage.html">Contact</a>
+      </nav>
+    </header>
+
+    <main class="content-card">
+      <section class="copy-stack">
+        <p class="eyebrow">Project Showcase / Robotics / Web Development</p>
+        <h1 class="page-title">Projects</h1>
+        <p class="lead">Click on any project below to view the full details.</p>
+        <div class="search-shell">
+          <div class="search-field">
+            <span class="search-icon">&#128269;</span>
+            <input type="text" id="project-search" placeholder="Search projects..." aria-label="Search projects">
+          </div>
+        </div>
+      </section>
+
+      
+      <section class="tips-stack" id="projects-stack">
+        <article class="tip-card">
+          <a href="project-artifactstory.html" class="tip-card-link">
+            <div class="tip-content">
+              <p class="tip-label">Project 01</p>
+              <h2 class="tip-title">Project ArtifactStory.com</h2>
+              <p class="body-copy">A website that me and my colleagues made and presented for a FLL competition.</p>
+            </div>
+            <div class="tip-gallery">
+              <div class="tip-media">
+                <div class="tip-image-wrap">
+                  <img class="tip-image" src="images/ArtifactStoryImage.webp" alt="ArtifactStory.com">
+                </div>
+              </div>
+            </div>
+          </a>
+        </article>
+
+        
+<!--
+        <article class="tip-card">
+          <a href="project-robotics.html" class="tip-card-link">
+            <div class="tip-content">
+              <p class="tip-label">Project 02</p>
+              <h2 class="tip-title">Robotics</h2>
+              <p class="body-copy">My journey in robotics including FLL (First Lego League) competitions and hands-on engineering projects. Building robots and solving real-world challenges.</p>
+            </div>
+            <div class="tip-gallery">
+              <div class="tip-media">
+                <div class="tip-image-wrap">
+                  <img class="tip-image" src="images/FLLLogo.jpg" alt="Robotics">
+                </div>
+              </div>
+            </div>
+          </a>
+        </article>
+
+        <article class="tip-card">
+          <a href="project-this-website.html" class="tip-card-link">
+            <div class="tip-content">
+              <p class="tip-label">Project 03</p>
+              <h2 class="tip-title">This Website</h2>
+              <p class="body-copy">The story behind building this personal website from scratch. From concept to deployment, learn about the technologies and design decisions used.</p>
+            </div>
+            <div class="tip-gallery">
+              <div class="tip-media">
+                <div class="tip-image-wrap">
+                  <img class="tip-image" src="images/Old Website.webp" alt="This Website">
+                </div>
+              </div>
+            </div>
+          </a>
+        </article>
+      </section>
+
+      <section class="author-bio author-bio--projects" aria-labelledby="projects-author-bio-title">
+        <p class="author-bio__label">About the Author</p>
+        <h2 class="author-bio__title" id="projects-author-bio-title">Henry Alberts</h2>
+        <p class="author-bio__text">Henry Alberts builds and writes these projects as part of his personal website, combining software development, technology, and hands-on making. He uses this space to document what he has learned, show what he has built, and create a record he can revisit later.</p>
+        <p class="author-bio__date">Updated April 27, 2026</p>
+      </section>
+    </main>
+  </div>
+
+  <style>
+    .tip-card-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .tip-card-link:hover {
+      opacity: 0.9;
+    }
+    .tip-card-link .tip-gallery {
+      margin-top: 1rem;
+    }
+    .tip-card-link .tip-image-wrap {
+      max-width: 300px;
+    }
+  </style>
+
+  <script>
+    (function() {
+      const searchInput = document.getElementById('project-search');
+      const stack = document.getElementById('projects-stack');
+      if (!searchInput || !stack) return;
+
+      const cards = Array.from(stack.querySelectorAll('.tip-card'));
+      let noResults = stack.querySelector('.no-results');
+      if (!noResults) {
+        noResults = document.createElement('p');
+        noResults.className = 'no-results';
+        noResults.textContent = 'No projects found matching your search.';
+        stack.appendChild(noResults);
+      }
+
+      searchInput.addEventListener('input', function() {
+        const query = this.value.trim().toLowerCase();
+        let visibleCount = 0;
+
+        cards.forEach(function(card) {
+          const title = (card.querySelector('.tip-title')?.textContent || '').toLowerCase();
+          const body = (card.querySelector('.body-copy')?.textContent || '').toLowerCase();
+          const label = (card.querySelector('.tip-label')?.textContent || '').toLowerCase();
+          const match = title.includes(query) || body.includes(query) || label.includes(query);
+
+          if (match) {
+            card.style.display = '';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        noResults.classList.toggle('visible', visibleCount === 0 && query.length > 0);
+      });
+    })();
+  </script>
+  <footer class="page-copyright">
+    <p>© 2026-2027 Henry S Alberts. All rights reserved</p>
+  </footer>
+</body>
+</html>
+
+
+
+
+
+

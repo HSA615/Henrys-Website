@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Best budget PC builds 2026 illustration</title>
+  <desc id="desc">Three stylized PC towers representing entry, balanced, and upgrade-friendly budget builds for 2026.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#090909"/>
+      <stop offset="55%" stop-color="#170b0d"/>
+      <stop offset="100%" stop-color="#0d0b0b"/>
+    </linearGradient>
+    <linearGradient id="tower" x1="0" x2="1">
+      <stop offset="0%" stop-color="#151a22"/>
+      <stop offset="100%" stop-color="#0d1218"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" fill="url(#bg)"/>
+  <circle cx="210" cy="180" r="120" fill="#ff5b77" opacity=".12"/>
+  <circle cx="995" cy="220" r="110" fill="#f3bc4e" opacity=".12"/>
+  <rect x="150" y="210" width="250" height="420" rx="30" fill="url(#tower)" stroke="#f3bc4e" stroke-opacity=".32" stroke-width="4"/>
+  <rect x="475" y="170" width="250" height="460" rx="30" fill="url(#tower)" stroke="#f3bc4e" stroke-opacity=".32" stroke-width="4"/>
+  <rect x="800" y="130" width="250" height="500" rx="30" fill="url(#tower)" stroke="#f3bc4e" stroke-opacity=".32" stroke-width="4"/>
+  <rect x="185" y="255" width="180" height="265" rx="18" fill="#0d1117" stroke="#ff5b77" stroke-opacity=".35"/>
+  <rect x="510" y="215" width="180" height="305" rx="18" fill="#0d1117" stroke="#ff5b77" stroke-opacity=".35"/>
+  <rect x="835" y="175" width="180" height="345" rx="18" fill="#0d1117" stroke="#ff5b77" stroke-opacity=".35"/>
+  <circle cx="275" cy="330" r="38" fill="none" stroke="#f3bc4e" stroke-width="10"/>
+  <circle cx="275" cy="425" r="38" fill="none" stroke="#f3bc4e" stroke-width="10"/>
+  <circle cx="600" cy="305" r="44" fill="none" stroke="#f3bc4e" stroke-width="10"/>
+  <circle cx="600" cy="415" r="44" fill="none" stroke="#f3bc4e" stroke-width="10"/>
+  <circle cx="925" cy="280" r="50" fill="none" stroke="#f3bc4e" stroke-width="10"/>
+  <circle cx="925" cy="405" r="50" fill="none" stroke="#f3bc4e" stroke-width="10"/>
+  <rect x="224" y="545" width="102" height="14" rx="7" fill="#ff5b77"/>
+  <rect x="548" y="545" width="104" height="14" rx="7" fill="#ff5b77"/>
+  <rect x="874" y="545" width="104" height="14" rx="7" fill="#ff5b77"/>
+  <text x="275" y="690" fill="#fff4df" font-family="Trebuchet MS, sans-serif" font-size="34" text-anchor="middle">Starter</text>
+  <text x="600" y="690" fill="#fff4df" font-family="Trebuchet MS, sans-serif" font-size="34" text-anchor="middle">Balanced</text>
+  <text x="925" y="690" fill="#fff4df" font-family="Trebuchet MS, sans-serif" font-size="34" text-anchor="middle">Upgrade Ready</text>
+  <text x="275" y="735" fill="#f3bc4e" font-family="Trebuchet MS, sans-serif" font-size="28" text-anchor="middle">$600-$750</text>
+  <text x="600" y="735" fill="#f3bc4e" font-family="Trebuchet MS, sans-serif" font-size="28" text-anchor="middle">$800-$950</text>
+  <text x="925" y="735" fill="#f3bc4e" font-family="Trebuchet MS, sans-serif" font-size="28" text-anchor="middle">$950-$1100</text>
+  <text x="130" y="820" fill="#f3bc4e" font-family="Palatino Linotype, serif" font-size="64">Best Budget PC Builds 2026</text>
+  <text x="130" y="870" fill="#fff4df" font-family="Trebuchet MS, sans-serif" font-size="32">Three smart ways to spend less and still get a fast, useful desktop.</text>
+</svg>

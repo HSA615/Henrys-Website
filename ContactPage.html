@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contact Henry Alberts for questions, feedback, or collaboration on projects and tech tips.">
+  <meta property="og:title" content="Contact | Henrys Website">
+  <meta property="og:description" content="Contact Henry Alberts for questions, feedback, or collaboration on projects and tech tips.">
+  <link rel="icon" type="image/png" sizes="1000x1000" href="images/Favicon.png">
+  <title>Contact | Henrys Website</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="site.js"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <div class="particle-field" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <header class="site-nav">
+      <a class="brand" href="index.html">Henry Alberts</a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a class="nav-link" href="index.html">Home</a>
+        <a class="nav-link" href="Projects.html">Projects</a>
+        <a class="nav-link" href="TechTips.html">Tech Tips</a>
+        <a class="nav-link" href="MyFavoriteMusic.html">Music</a>
+        <a class="action-link" href="https://www.youtube.com/@GottaGoTech" target="_blank" rel="noreferrer">YouTube</a>
+        <a class="nav-link current" href="ContactPage.html" aria-current="page">Contact</a>
+      </nav>
+    </header>
+
+    <main class="content-card">
+      <section class="copy-stack">
+        <p class="eyebrow">Work Together</p>
+        <h1 class="page-title">Contact Me</h1>
+        <p class="lead">You can hire me to code projects for you or make videos. I also have skills in 3D modling to create artistic and industrial designs. Parts can be sent as a 3D model or be printed and shiped at an addtional charge. If you need code made I can code HTML, CSS, JavaScript, and Python. Other coding languages are available upon request, but may be charged at an additional rate. I accept payment by PayPal, and you can contact me using the form below.</p>
+      </section>
+
+      <section class="contact-form-shell" aria-labelledby="contact-form-heading">
+        <div class="contact-form-panel">
+          <p class="eyebrow">Direct Message</p>
+          <h2 class="form-title" id="contact-form-heading">Send Me a Message</h2>
+          <p class="body-copy form-copy">Use the form below to email me directly. Please keep the message text-only. Images, screenshots, and other uploads are not accepted.</p>
+
+          <form
+            class="contact-form"
+            id="contact-form"
+            action="https://formsubmit.co/hsalberts321@gmail.com"
+            data-ajax-endpoint="https://formsubmit.co/ajax/hsalberts321@gmail.com"
+            method="POST"
+          >
+            <input type="hidden" name="_subject" value="New contact form message from Henrys Website">
+            <input type="hidden" name="_template" value="table">
+            <input class="honey-field" type="text" name="_honey" tabindex="-1" autocomplete="off">
+
+            <div class="field-group">
+              <label class="visually-hidden" for="contact-name">Name</label>
+              <input id="contact-name" name="name" type="text" autocomplete="name" placeholder="Name" required>
+            </div>
+
+            <div class="field-group">
+              <label class="visually-hidden" for="contact-email">Email Address</label>
+              <input id="contact-email" name="email" type="email" autocomplete="email" placeholder="Email Address" required>
+            </div>
+
+            <div class="field-group">
+              <label class="visually-hidden" for="contact-subject">Subject</label>
+              <input id="contact-subject" name="subject" type="text" autocomplete="off" placeholder="Subject" required>
+            </div>
+
+            <div class="field-group">
+              <label class="visually-hidden" for="contact-message">Message</label>
+              <textarea id="contact-message" name="message" rows="10" placeholder="Message" aria-describedby="message-guidance" required></textarea>
+            </div>
+
+            
+            <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+
+            <button class="contact-submit" type="submit">Send</button>
+          </form>
+        </div>
+
+        <div class="contact-grid">
+          <article class="info-panel payment-panel">
+            <h3>Payments</h3>
+            <p>PayPal is available for project work and freelance coding requests.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const contactForm = document.getElementById("contact-form");
+
+    if (contactForm) {
+      const nameField = document.getElementById("contact-name");
+      const emailField = document.getElementById("contact-email");
+      const subjectField = document.getElementById("contact-subject");
+      const messageField = document.getElementById("contact-message");
+      const statusField = document.getElementById("form-status");
+      const submitButton = contactForm.querySelector(".contact-submit");
+
+      const setStatus = (message, type) => {
+        statusField.textContent = message;
+        statusField.className = "form-status";
+
+        if (type) {
+          statusField.classList.add(type);
+        }
+      };
+
+      const hasFiles = (event) => {
+        const items = event.dataTransfer?.items || event.clipboardData?.items;
+
+        if (items && items.length) {
+          return Array.from(items).some((item) => item.kind === "file");
+        }
+
+        const files = event.dataTransfer?.files || event.clipboardData?.files;
+        return Boolean(files && files.length);
+      };
+
+      const hasImages = (event) => {
+        const items = event.dataTransfer?.items || event.clipboardData?.items;
+
+        if (items && items.length) {
+          return Array.from(items).some((item) => item.kind === "file" && item.type.startsWith("image/"));
+        }
+
+        const files = event.dataTransfer?.files || event.clipboardData?.files;
+        return Boolean(files && Array.from(files).some((file) => file.type.startsWith("image/")));
+      };
+
+      const stopFileUpload = (event) => {
+        if (!hasFiles(event)) {
+          return;
+        }
+
+        event.preventDefault();
+
+        if (hasImages(event)) {
+          setStatus("Pictures are not accepted. Please send text only in the message box.", "error");
+          return;
+        }
+
+        setStatus("This contact form only accepts typed text. File uploads are not allowed.", "error");
+      };
+
+      ["dragenter", "dragover", "drop"].forEach((eventName) => {
+        contactForm.addEventListener(eventName, (event) => {
+          if (!hasFiles(event)) {
+            return;
+          }
+
+          event.preventDefault();
+
+          if (eventName === "dragover" && event.dataTransfer) {
+            event.dataTransfer.dropEffect = "none";
+            return;
+          }
+
+          stopFileUpload(event);
+        });
+      });
+
+      messageField.addEventListener("paste", stopFileUpload);
+
+      contactForm.addEventListener("input", () => {
+        setStatus("");
+      });
+
+      contactForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        setStatus("");
+
+        [nameField, emailField, subjectField, messageField].forEach((field) => {
+          field.value = field.value.trim();
+        });
+
+        if (!contactForm.reportValidity()) {
+          return;
+        }
+
+        submitButton.disabled = true;
+        submitButton.textContent = "Sending...";
+
+        const formData = new FormData(contactForm);
+        formData.set("_replyto", emailField.value);
+
+        try {
+          const response = await fetch(contactForm.dataset.ajaxEndpoint, {
+            method: "POST",
+            body: formData,
+            headers: {
+              Accept: "application/json"
+            }
+          });
+
+          const data = await response.json().catch(() => ({}));
+
+          if (!response.ok || data.success === false) {
+            throw new Error("Request failed");
+          }
+
+          contactForm.reset();
+          setStatus("Your message was sent successfully. I will reply to the email address you entered.", "success");
+        } catch (error) {
+          setStatus("The form could not send right now. Please email me directly at hsalberts321@gmail.com.", "error");
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = "Send";
+        }
+      });
+    }
+  </script>
+  <footer class="page-copyright">
+    <p>© 2026-2027 Henry S Alberts. All rights reserved</p>
+  </footer>
+</body>
+</html>
+
+
+
+
+
+

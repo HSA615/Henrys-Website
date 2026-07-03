@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">What does RAM actually do illustration</title>
+  <desc id="desc">A stylized memory module with flowing data lines and simple labels about multitasking, speed, and temporary storage.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0d0909"/>
+      <stop offset="60%" stop-color="#180c10"/>
+      <stop offset="100%" stop-color="#090909"/>
+    </linearGradient>
+    <linearGradient id="ram" x1="0" x2="1">
+      <stop offset="0%" stop-color="#1a3f2f"/>
+      <stop offset="100%" stop-color="#143025"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" fill="url(#bg)"/>
+  <circle cx="190" cy="130" r="120" fill="#f3bc4e" opacity=".1"/>
+  <circle cx="1020" cy="760" r="170" fill="#ff5b77" opacity=".1"/>
+  <rect x="170" y="280" width="860" height="255" rx="30" fill="url(#ram)" stroke="#f3bc4e" stroke-opacity=".35" stroke-width="4"/>
+  <rect x="205" y="340" width="95" height="95" rx="12" fill="#0f1712" stroke="#ff5b77" stroke-opacity=".45"/>
+  <rect x="320" y="340" width="95" height="95" rx="12" fill="#0f1712" stroke="#ff5b77" stroke-opacity=".45"/>
+  <rect x="435" y="340" width="95" height="95" rx="12" fill="#0f1712" stroke="#ff5b77" stroke-opacity=".45"/>
+  <rect x="550" y="340" width="95" height="95" rx="12" fill="#0f1712" stroke="#ff5b77" stroke-opacity=".45"/>
+  <rect x="665" y="340" width="95" height="95" rx="12" fill="#0f1712" stroke="#ff5b77" stroke-opacity=".45"/>
+  <rect x="780" y="340" width="95" height="95" rx="12" fill="#0f1712" stroke="#ff5b77" stroke-opacity=".45"/>
+  <rect x="895" y="340" width="95" height="95" rx="12" fill="#0f1712" stroke="#ff5b77" stroke-opacity=".45"/>
+  <g fill="#d4a33f">
+    <rect x="220" y="535" width="18" height="70" rx="7"/>
+    <rect x="255" y="535" width="18" height="70" rx="7"/>
+    <rect x="290" y="535" width="18" height="70" rx="7"/>
+    <rect x="325" y="535" width="18" height="70" rx="7"/>
+    <rect x="360" y="535" width="18" height="70" rx="7"/>
+    <rect x="395" y="535" width="18" height="70" rx="7"/>
+    <rect x="430" y="535" width="18" height="70" rx="7"/>
+    <rect x="465" y="535" width="18" height="70" rx="7"/>
+    <rect x="500" y="535" width="18" height="70" rx="7"/>
+    <rect x="535" y="535" width="18" height="70" rx="7"/>
+    <rect x="570" y="535" width="18" height="70" rx="7"/>
+    <rect x="605" y="535" width="18" height="70" rx="7"/>
+    <rect x="640" y="535" width="18" height="70" rx="7"/>
+    <rect x="675" y="535" width="18" height="70" rx="7"/>
+    <rect x="710" y="535" width="18" height="70" rx="7"/>
+    <rect x="745" y="535" width="18" height="70" rx="7"/>
+    <rect x="780" y="535" width="18" height="70" rx="7"/>
+    <rect x="815" y="535" width="18" height="70" rx="7"/>
+    <rect x="850" y="535" width="18" height="70" rx="7"/>
+    <rect x="885" y="535" width="18" height="70" rx="7"/>
+    <rect x="920" y="535" width="18" height="70" rx="7"/>
+  </g>
+  <path d="M130 190c95 0 120 95 210 95s120-95 210-95 120 95 210 95 120-95 210-95" fill="none" stroke="#ff5b77" stroke-width="8" stroke-linecap="round" opacity=".8"/>
+  <path d="M160 225c95 0 120 95 210 95s120-95 210-95 120 95 210 95 120-95 210-95" fill="none" stroke="#f3bc4e" stroke-width="6" stroke-linecap="round" opacity=".8"/>
+  <text x="145" y="730" fill="#f3bc4e" font-family="Palatino Linotype, serif" font-size="64">What Does RAM Actually Do?</text>
+  <text x="145" y="787" fill="#fff4df" font-family="Trebuchet MS, sans-serif" font-size="32">Temporary working memory for active apps, tabs, files, and multitasking.</text>
+  <text x="180" y="260" fill="#fff4df" font-family="Trebuchet MS, sans-serif" font-size="30">Fast workspace</text>
+  <text x="850" y="260" fill="#fff4df" font-family="Trebuchet MS, sans-serif" font-size="30" text-anchor="end">Not long-term storage</text>
+  <text x="210" y="470" fill="#fff4df" font-family="Trebuchet MS, sans-serif" font-size="28">Apps you have open</text>
+  <text x="785" y="470" fill="#fff4df" font-family="Trebuchet MS, sans-serif" font-size="28">Data ready right now</text>
+</svg>
