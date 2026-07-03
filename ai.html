@@ -1175,10 +1175,10 @@
             </div>
             <div class="form-group">
                 <label>Model</label>
-                <input type="text" id="settingModel" list="modelSuggestions" placeholder="e.g. gpt-oss-120b" autocomplete="off">
+                <input type="text" id="settingModel" list="modelSuggestions" placeholder="e.g. openai/gpt-oss-120b" autocomplete="off">
                 <datalist id="modelSuggestions">
-                    <option value="gpt-oss-120b">
-                    <option value="gpt-oss-20b">
+                    <option value="openai/gpt-oss-120b">
+                    <option value="openai/gpt-oss-20b">
                     <option value="llama-3.3-70b-versatile">
                     <option value="llama-3.1-8b-instant">
                 </datalist>
@@ -1231,7 +1231,7 @@
                 tokensGenerated: 0,
                 settings: {
                     apiKey: '',
-                    model: 'gpt-oss-120b',
+                    model: 'openai/gpt-oss-120b',
                     temperature: 0.7,
                     maxTokens: 2048,
                     topP: 1,
@@ -1242,6 +1242,27 @@
             };
 
             function generateId() { return Math.random().toString(36).substring(2, 11); }
+
+            function normalizeModel(model) {
+                const value = (model || '').trim();
+                if (!value) return 'openai/gpt-oss-120b';
+                if (value.toLowerCase().startsWith('openai/')) return value;
+                if (value.toLowerCase() === 'gpt-oss-120b' || value.toLowerCase() === 'gpt-oss-20b') {
+                    return `openai/${value}`;
+                }
+                return value;
+            }
+
+            function getErrorMessage(resp, fallbackText) {
+                return resp.text ? resp.text().then(text => {
+                    try {
+                        const data = JSON.parse(text);
+                        return data.error?.message || data.message || text || fallbackText;
+                    } catch (e) {
+                        return text || fallbackText;
+                    }
+                }) : Promise.resolve(fallbackText);
+            }
 
             function saveState() {
                 localStorage.setItem('groqChatState', JSON.stringify(state));
@@ -1543,7 +1564,7 @@
                 if (state.settings.systemPrompt) msgs.push({ role: 'system', content: state.settings.systemPrompt });
                 conv.messages.slice(0, -1).forEach(m => msgs.push({ role: m.role, content: m.content }));
                 const body = {
-                    model: state.settings.model,
+                    model: normalizeModel(state.settings.model),
                     messages: msgs,
                     temperature: parseFloat(state.settings.temperature),
                     max_tokens: parseInt(state.settings.maxTokens),
@@ -1561,7 +1582,8 @@
                         signal: state.abortController.signal
                     });
                     if (!resp.ok) {
-                        conv.messages[aiIdx].content = 'Error: ' + resp.statusText;
+                        const errorText = await getErrorMessage(resp, resp.statusText || 'Unknown error');
+                        conv.messages[aiIdx].content = 'Error: ' + errorText;
                         saveConversations();
                         renderChat();
                         return;
@@ -1650,7 +1672,7 @@
                         { role: 'user', content: `Answer this question directly using your knowledge: ${query}` }
                     ];
                     const body = {
-                        model: state.settings.model || 'gpt-oss-120b',
+                        model: normalizeModel(state.settings.model || 'openai/gpt-oss-120b'),
                         messages: msgs,
                         temperature: parseFloat(state.settings.temperature),
                         max_tokens: Math.min(2048, parseInt(state.settings.maxTokens) || 1024),
@@ -1666,8 +1688,8 @@
                         body: JSON.stringify(body)
                     });
                     if (!resp.ok) {
-                        const errText = await resp.text();
-                        return 'Groq search failed: ' + (errText || resp.statusText);
+                        const errText = await getErrorMessage(resp, resp.statusText || 'Unknown error');
+                        return 'Groq search failed: ' + errText;
                     }
                     const data = await resp.json();
                     const text = data.choices?.[0]?.message?.content || data.choices?.[0]?.text || '';
@@ -1767,7 +1789,7 @@
 
             function saveSettings() {
                 state.settings.apiKey = document.getElementById('settingApiKey').value.trim();
-                state.settings.model = document.getElementById('settingModel').value.trim() || 'gpt-oss-120b';
+                state.settings.model = normalizeModel(document.getElementById('settingModel').value) || 'openai/gpt-oss-120b';
                 state.settings.temperature = parseFloat(document.getElementById('settingTemperature').value);
                 state.settings.maxTokens = parseInt(document.getElementById('settingMaxTokens').value);
                 state.settings.topP = parseFloat(document.getElementById('settingTopP').value);
