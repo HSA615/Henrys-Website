@@ -1,6 +1,6 @@
 // 🔥 YOUR Firebase config (PUT YOUR REAL ONE HERE)
 const firebaseConfig = {
-  apiKey: "AIzaSyCvbFuZIVnPpn3AG7msPkeoidafC3lOP_U",
+  apiKey: "YOUR_FIREBASE_API_KEY",
   authDomain: "music-comment-section.firebaseapp.com",
   databaseURL: "https://music-comment-section-default-rtdb.firebaseio.com/", // IMPORTANT for Realtime DB
   projectId: "music-comment-section"

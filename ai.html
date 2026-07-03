@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Gemini Chat</title>
+    <title>Groq Chat</title>
     <style>
         :root {
             --bg-primary: #0b0b10;
@@ -1110,7 +1110,7 @@
 
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <span class="sidebar-logo">✨ Gemini Chat</span>
+            <span class="sidebar-logo">⚡ Groq Chat</span>
         </div>
         <div class="sidebar-new-chat">
             <button class="btn btn-accent" onclick="newChat()" title="New Chat">
@@ -1134,7 +1134,7 @@
             <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
-            <span class="topbar-title" id="topbarTitle">Gemini Chat</span>
+            <span class="topbar-title" id="topbarTitle">Groq Chat</span>
             <div class="topbar-actions">
                 <button class="btn btn-ghost btn-sm" onclick="exportChat()" title="Export">Export</button>
                 <button class="btn btn-ghost btn-sm" onclick="importChatTrigger()" title="Import">Import</button>
@@ -1145,13 +1145,13 @@
         <div class="chat-container" id="chatContainer">
             <div class="welcome-screen" id="welcomeScreen">
                 <div class="logo-icon">⚡</div>
-                <h2>Gemini Chat</h2>
-                <p>Talk, search, and generate images with Gemini. Ask me anything.</p>
+                <h2>Groq Chat</h2>
+                <p>Fast AI responses powered by Groq. Ask me anything.</p>
             </div>
         </div>
         <div class="input-area" id="inputArea">
             <div class="input-row" id="inputRow">
-                <textarea id="chatInput" rows="1" placeholder="Ask, search, or image: ..." maxlength="100000" onkeydown="handleInputKeydown(event)" onkeyup="handleInputKeydown(event)" oninput="autoResizeTextarea()"></textarea>
+                <textarea id="chatInput" rows="1" placeholder="Ask me anything..." maxlength="100000" onkeydown="handleInputKeydown(event)" onkeyup="handleInputKeydown(event)" oninput="autoResizeTextarea()"></textarea>
                 <button type="button" class="btn btn-ghost" id="searchBtn" onclick="searchAndSend()" title="Search">🔎</button>
                 <button type="button" class="btn btn-accent btn-send" id="sendBtn" onclick="sendMessage()" title="Send">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
@@ -1170,17 +1170,17 @@
         <div class="modal">
             <h3>⚙️ Settings</h3>
             <div class="form-group">
-                <label>Google AI Studio API Key</label>
-                <input type="password" id="settingApiKey" placeholder="AIza..." autocomplete="off">
+                <label>Groq API Key</label>
+                <input type="password" id="settingApiKey" placeholder="gsk_..." autocomplete="off">
             </div>
             <div class="form-group">
                 <label>Model</label>
                 <input type="text" id="settingModel" list="modelSuggestions" placeholder="e.g. llama-3.3-70b-versatile" autocomplete="off">
                 <datalist id="modelSuggestions">
-                    <option value="gemini-2.0-flash">
-                    <option value="gemini-2.0-flash-lite">
-                    <option value="gemini-2.5-flash">
-                    <option value="gemini-2.5-pro">
+                    <option value="llama-3.3-70b-versatile">
+                    <option value="llama-3.1-8b-instant">
+                    <option value="mixtral-8x7b-32768">
+                    <option value="gemma2-9b-it">
                 </datalist>
             </div>
             <div class="form-group">
@@ -1213,14 +1213,6 @@
                     Light Mode
                 </label>
             </div>
-            <div class="form-group">
-                <label>Google Custom Search API Key</label>
-                <input type="password" id="settingGoogleApiKey" placeholder="AIza... (optional)" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label>Google Search Engine ID (cx)</label>
-                <input type="text" id="settingGoogleCx" placeholder="Search Engine ID (cx)" autocomplete="off">
-            </div>
             <div class="modal-actions">
                 <button class="btn btn-ghost btn-sm" onclick="closeSettings()">Cancel</button>
                 <button class="btn btn-accent btn-sm" onclick="saveSettings()">Save</button>
@@ -1239,27 +1231,24 @@
                 tokensGenerated: 0,
                 settings: {
                     apiKey: '',
-                    model: 'gemini-2.0-flash',
+                    model: 'llama-3.3-70b-versatile',
                     temperature: 0.7,
                     maxTokens: 2048,
                     topP: 1,
                     systemPrompt: '',
                     streaming: true,
-                    theme: 'dark',
-                        // optional Google Custom Search (client-side). Storing here is insecure; prefer server proxy.
-                        googleApiKey: '',
-                        googleCx: ''
+                    theme: 'dark'
                 }
             };
 
             function generateId() { return Math.random().toString(36).substring(2, 11); }
 
             function saveState() {
-                localStorage.setItem('geminiChatState', JSON.stringify(state));
+                localStorage.setItem('groqChatState', JSON.stringify(state));
             }
 
             function loadState() {
-                const s = localStorage.getItem('geminiChatState');
+                const s = localStorage.getItem('groqChatState');
                 if (s) Object.assign(state, JSON.parse(s));
             }
 
@@ -1323,7 +1312,7 @@
                 const titleEl = document.getElementById('topbarTitle');
                 const conv = getCurrentConversation();
                 if (titleEl) {
-                    titleEl.textContent = conv?.title || 'Gemini Chat';
+                    titleEl.textContent = conv?.title || 'Groq Chat';
                 }
             }
 
@@ -1353,14 +1342,12 @@
                     row.dataset.index = i;
                     const avatar = m.role === 'user' ? 'You' : 'AI';
                     const avatarClass = m.role === 'user' ? 'avatar-user' : 'avatar-ai';
-                    const imageMarkup = m.imageDataUrl ? `<img src="${m.imageDataUrl}" alt="Generated image" class="generated-image" />` : '';
-                    const rendered = m.content ? renderMarkdown(m.content) : '';
-                    const bubbleContent = rendered || imageMarkup ? `${imageMarkup}${rendered}` : '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+                    const rendered = m.content ? renderMarkdown(m.content) : '<div class="typing-indicator"><span></span><span></span><span></span></div>';
 
                     row.innerHTML = `
                         <div class="message-avatar ${avatarClass}">${escapeHtml(avatar)}</div>
                         <div class="message-bubble-wrap">
-                            <div class="message-bubble">${bubbleContent}</div>
+                            <div class="message-bubble">${rendered}</div>
                             <div class="message-actions">
                                 <button class="btn btn-ghost btn-sm" onclick="copyMessage(${i})">📋</button>
                                 ${m.role === 'user' ? `<button class="btn btn-ghost btn-sm" onclick="editMessage(${i})">✏️</button>` : ''}
@@ -1506,18 +1493,10 @@
                 const input = document.getElementById('chatInput');
                 const content = input.value.trim();
                 if (!content) return;
-
-                if (content.toLowerCase().startsWith('image:') || content.toLowerCase().startsWith('img:') || content.toLowerCase().startsWith('draw:')) {
-                    const prompt = content.replace(/^image:\s*/i, '').replace(/^img:\s*/i, '').replace(/^draw:\s*/i, '').trim();
-                    if (!prompt) return;
-                    await generateImage(prompt);
-                    return;
-                }
-
                 if (content.toLowerCase().startsWith('search:')) {
                     const q = content.split(':').slice(1).join(':').trim();
                     if (!q) return;
-                    showToast('Searching with Gemini...');
+                    showToast('Searching web...');
                     const summary = await performWebSearch(q);
                     const conv = ensureConversation();
                     conv.messages.push({ role: 'user', content, timestamp: Date.now() });
@@ -1530,13 +1509,10 @@
                     renderAll();
                     return;
                 }
-
                 if (!state.settings.apiKey) {
-                    showToast('Set your Google AI Studio API key in Settings.');
-                    openSettings();
-                    return;
+                    showToast('Set API key in Settings.');
+                    openSettings(); return;
                 }
-
                 const conv = ensureConversation();
                 conv.messages.push({ role: 'user', content, timestamp: Date.now() });
                 if (conv.title === 'New Chat') conv.title = autoTitle(conv.messages);
@@ -1546,7 +1522,6 @@
                 input.style.height = 'auto';
                 updateInputStats();
                 renderAll();
-
                 const aiIdx = conv.messages.length;
                 conv.messages.push({ role: 'assistant', content: '', timestamp: Date.now() });
                 saveConversations();
@@ -1555,58 +1530,80 @@
                 const aiBubble = aiRow?.querySelector('.message-bubble');
                 if (aiBubble) {
                     aiRow.querySelector('.message-actions')?.remove();
-                    aiBubble.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+                    aiBubble.innerHTML =
+                        '<div class="typing-indicator"><span></span><span></span><span></span></div>';
                 }
-
                 scrollToBottom();
                 state.isGenerating = true;
                 state.abortController = new AbortController();
                 state.generationStartTime = Date.now();
                 state.tokensGenerated = 0;
                 updateSendStopButtons();
-
-                const model = state.settings.model || 'gemini-2.0-flash';
-                const contents = [];
-                if (state.settings.systemPrompt) {
-                    contents.push({ role: 'user', parts: [{ text: `System instruction: ${state.settings.systemPrompt}` }] });
-                }
-                conv.messages.slice(0, -1).forEach(m => {
-                    const role = m.role === 'assistant' ? 'model' : 'user';
-                    contents.push({ role, parts: [{ text: m.content }] });
-                });
-
+                const msgs = [];
+                if (state.settings.systemPrompt) msgs.push({ role: 'system', content: state.settings.systemPrompt });
+                conv.messages.slice(0, -1).forEach(m => msgs.push({ role: m.role, content: m.content }));
+                const body = {
+                    model: state.settings.model,
+                    messages: msgs,
+                    temperature: parseFloat(state.settings.temperature),
+                    max_tokens: parseInt(state.settings.maxTokens),
+                    top_p: parseFloat(state.settings.topP),
+                    stream: state.settings.streaming
+                };
                 try {
-                    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(state.settings.apiKey)}`, {
+                    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents,
-                            generationConfig: {
-                                temperature: parseFloat(state.settings.temperature),
-                                topP: parseFloat(state.settings.topP),
-                                maxOutputTokens: parseInt(state.settings.maxTokens) || 2048
-                            }
-                        }),
+                        headers: {
+                            'Authorization': `Bearer ${state.settings.apiKey}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(body),
                         signal: state.abortController.signal
                     });
-
-                    const data = await resp.json();
                     if (!resp.ok) {
-                        conv.messages[aiIdx].content = 'Gemini error: ' + (data.error?.message || resp.statusText);
+                        conv.messages[aiIdx].content = 'Error: ' + resp.statusText;
                         saveConversations();
                         renderChat();
                         return;
                     }
-
-                    const text = data.candidates?.[0]?.content?.parts?.map(part => part.text).filter(Boolean).join('') || 'No response';
-                    conv.messages[aiIdx].content = text;
-                    if (aiBubble) aiBubble.innerHTML = renderMarkdown(text);
+                    if (state.settings.streaming && resp.body) {
+                        const reader = resp.body.getReader();
+                        const decoder = new TextDecoder();
+                        let buffer = '';
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+                            buffer += decoder.decode(value, { stream: true });
+                            const lines = buffer.split('\n');
+                            buffer = lines[lines.length - 1];
+                            for (let i = 0; i < lines.length - 1; i++) {
+                                const line = lines[i].trim();
+                                if (!line || !line.startsWith('data:')) continue;
+                                const jsonStr = line.substring(6).trim();
+                                if (jsonStr === '[DONE]') break;
+                                try {
+                                    const chunk = JSON.parse(jsonStr);
+                                    const delta = chunk.choices[0]?.delta?.content || '';
+                                    if (delta) {
+                                        conv.messages[aiIdx].content += delta;
+                                        state.tokensGenerated++;
+                                    }
+                                } catch (e) { }
+                            }
+                            if (aiBubble) aiBubble.innerHTML = renderMarkdown(conv.messages[aiIdx].content);
+                            scrollToBottom();
+                        }
+                    } else {
+                        const data = await resp.json();
+                        conv.messages[aiIdx].content = data.choices[0]?.message?.content || 'No response';
+                        if (aiBubble) aiBubble.innerHTML = renderMarkdown(conv.messages[aiIdx].content);
+                    }
                     conv.updatedAt = Date.now();
                     saveConversations();
                     renderChat();
                 } catch (err) {
                     if (err.name !== 'AbortError') {
-                        conv.messages[aiIdx].content = 'Gemini error: ' + err.message;
+                        conv.messages[aiIdx].content = 'Error: ' + err.message;
                         saveConversations();
                         renderChat();
                     }
@@ -1615,73 +1612,6 @@
                     updateSendStopButtons();
                     renderAll();
                     closeSidebarMobile();
-                }
-            }
-
-            async function generateImage(prompt) {
-                if (!state.settings.apiKey) {
-                    showToast('Set your Google AI Studio API key in Settings.');
-                    openSettings();
-                    return;
-                }
-
-                const conv = ensureConversation();
-                conv.messages.push({ role: 'user', content: `Image: ${prompt}`, timestamp: Date.now() });
-                conv.updatedAt = Date.now();
-                saveConversations();
-                renderAll();
-
-                const aiIdx = conv.messages.length;
-                conv.messages.push({ role: 'assistant', content: '', imageDataUrl: '', timestamp: Date.now() });
-                saveConversations();
-                renderAll();
-
-                const aiRow = document.querySelector(`.message-row[data-index="${aiIdx}"]`);
-                const aiBubble = aiRow?.querySelector('.message-bubble');
-                if (aiBubble) {
-                    aiRow.querySelector('.message-actions')?.remove();
-                    aiBubble.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
-                }
-                scrollToBottom();
-
-                try {
-                    const imageModel = 'gemini-2.0-flash-exp-image-generation';
-                    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(imageModel)}:generateContent?key=${encodeURIComponent(state.settings.apiKey)}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                            generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
-                        })
-                    });
-
-                    const data = await resp.json();
-                    if (!resp.ok) {
-                        conv.messages[aiIdx].content = 'Image generation failed: ' + (data.error?.message || resp.statusText);
-                        saveConversations();
-                        renderChat();
-                        return;
-                    }
-
-                    const parts = data.candidates?.[0]?.content?.parts || [];
-                    let text = '';
-                    let imageDataUrl = '';
-                    parts.forEach(part => {
-                        if (part.text) text += part.text;
-                        if (part.inlineData?.mimeType && part.inlineData?.data) {
-                            imageDataUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                        }
-                    });
-
-                    conv.messages[aiIdx].content = text || 'Image generated.';
-                    conv.messages[aiIdx].imageDataUrl = imageDataUrl;
-                    conv.updatedAt = Date.now();
-                    saveConversations();
-                    renderChat();
-                } catch (err) {
-                    conv.messages[aiIdx].content = 'Image generation error: ' + err.message;
-                    saveConversations();
-                    renderChat();
                 }
             }
 
@@ -1712,38 +1642,38 @@
             async function performWebSearch(query) {
                 try {
                     if (!state.settings.apiKey) {
-                        return 'Please add your Google AI Studio API key in Settings.';
+                        return 'Please add your Groq API key in Settings.';
                     }
-
                     const system = state.settings.systemPrompt || 'You are a helpful research assistant. Answer the user question directly and concisely.';
-                    const contents = [
-                        { role: 'user', parts: [{ text: `System instruction: ${system}` }] },
-                        { role: 'user', parts: [{ text: `Answer this question directly using your knowledge: ${query}` }] }
+                    const msgs = [
+                        { role: 'system', content: system },
+                        { role: 'user', content: `Answer this question directly using your knowledge: ${query}` }
                     ];
-
-                    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(state.settings.model || 'gemini-2.0-flash')}:generateContent?key=${encodeURIComponent(state.settings.apiKey)}`, {
+                    const body = {
+                        model: state.settings.model || 'llama-3.3-70b-versatile',
+                        messages: msgs,
+                        temperature: parseFloat(state.settings.temperature),
+                        max_tokens: Math.min(2048, parseInt(state.settings.maxTokens) || 1024),
+                        top_p: parseFloat(state.settings.topP),
+                        stream: false
+                    };
+                    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents,
-                            generationConfig: {
-                                temperature: parseFloat(state.settings.temperature),
-                                topP: parseFloat(state.settings.topP),
-                                maxOutputTokens: Math.min(2048, parseInt(state.settings.maxTokens) || 1024)
-                            }
-                        })
+                        headers: {
+                            'Authorization': `Bearer ${state.settings.apiKey}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(body)
                     });
-
                     if (!resp.ok) {
                         const errText = await resp.text();
-                        return 'Gemini search failed: ' + (errText || resp.statusText);
+                        return 'Groq search failed: ' + (errText || resp.statusText);
                     }
-
                     const data = await resp.json();
-                    const text = data.candidates?.[0]?.content?.parts?.map(part => part.text).filter(Boolean).join('') || '';
-                    return text || 'No answer returned from Gemini.';
+                    const text = data.choices?.[0]?.message?.content || data.choices?.[0]?.text || '';
+                    return text || 'No answer returned from Groq.';
                 } catch (e) {
-                    return 'Gemini search error: ' + e.message;
+                    return 'Groq search error: ' + e.message;
                 }
             }
 
@@ -1828,8 +1758,6 @@
                 document.getElementById('settingSystemPrompt').value = state.settings.systemPrompt;
                 document.getElementById('settingStreaming').checked = state.settings.streaming;
                 document.getElementById('settingTheme').checked = state.settings.theme === 'light';
-                document.getElementById('settingGoogleApiKey').value = state.settings.googleApiKey || '';
-                document.getElementById('settingGoogleCx').value = state.settings.googleCx || '';
                 document.getElementById('settingsModal').classList.remove('hidden');
             }
 
@@ -1845,8 +1773,6 @@
                 state.settings.topP = parseFloat(document.getElementById('settingTopP').value);
                 state.settings.systemPrompt = document.getElementById('settingSystemPrompt').value.trim();
                 state.settings.streaming = document.getElementById('settingStreaming').checked;
-                state.settings.googleApiKey = document.getElementById('settingGoogleApiKey').value.trim();
-                state.settings.googleCx = document.getElementById('settingGoogleCx').value.trim();
                 saveState();
                 closeSettings();
                 applyTheme();
