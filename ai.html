@@ -1558,7 +1558,8 @@
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ inputs: prompt }),
-                        signal: state.abortController?.signal
+                        signal: state.abortController?.signal,
+                        mode: 'cors'
                     });
 
                     if (!resp.ok) {
@@ -1580,7 +1581,11 @@
                     };
                     reader.readAsDataURL(blob);
                 } catch (err) {
-                    conv.messages[aiIdx].content = 'Image generation error: ' + err.message;
+                    const message = err?.message || 'Unknown error';
+                    const detail = message.includes('Failed to fetch')
+                        ? 'The browser could not reach the Hugging Face endpoint. This is often caused by CORS, a blocked network request, or an invalid/inactive API token.'
+                        : message;
+                    conv.messages[aiIdx].content = 'Image generation error: ' + detail;
                     saveConversations();
                     renderChat();
                 } finally {
