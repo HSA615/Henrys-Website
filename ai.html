@@ -1174,6 +1174,10 @@
                 <input type="password" id="settingApiKey" placeholder="gsk_..." autocomplete="off">
             </div>
             <div class="form-group">
+                <label>Image API Key (optional)</label>
+                <input type="password" id="settingImageApiKey" placeholder="Gemini / Google AI Studio key" autocomplete="off">
+            </div>
+            <div class="form-group">
                 <label>Model</label>
                 <input type="text" id="settingModel" list="modelSuggestions" placeholder="e.g. openai/gpt-oss-120b" autocomplete="off">
                 <datalist id="modelSuggestions">
@@ -1231,6 +1235,7 @@
                 tokensGenerated: 0,
                 settings: {
                     apiKey: '',
+                    imageApiKey: '',
                     model: 'openai/gpt-oss-120b',
                     temperature: 0.7,
                     maxTokens: 2048,
@@ -1363,12 +1368,14 @@
                     row.dataset.index = i;
                     const avatar = m.role === 'user' ? 'You' : 'AI';
                     const avatarClass = m.role === 'user' ? 'avatar-user' : 'avatar-ai';
+                    const imageMarkup = m.imageDataUrl ? `<img src="${m.imageDataUrl}" alt="Generated image" class="generated-image" />` : '';
                     const rendered = m.content ? renderMarkdown(m.content) : '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+                    const bubbleContent = imageMarkup || m.content ? `${imageMarkup}${rendered}` : '<div class="typing-indicator"><span></span><span></span><span></span></div>';
 
                     row.innerHTML = `
                         <div class="message-avatar ${avatarClass}">${escapeHtml(avatar)}</div>
                         <div class="message-bubble-wrap">
-                            <div class="message-bubble">${rendered}</div>
+                            <div class="message-bubble">${bubbleContent}</div>
                             <div class="message-actions">
                                 <button class="btn btn-ghost btn-sm" onclick="copyMessage(${i})">📋</button>
                                 ${m.role === 'user' ? `<button class="btn btn-ghost btn-sm" onclick="editMessage(${i})">✏️</button>` : ''}
@@ -1509,11 +1516,96 @@
                 sendMessage();
             }
 
+            function parseImagePrompt(content) {
+                const match = content.match(/^(image|img|draw)\s*:(.*)$/i);
+                return match ? match[2].trim() : '';
+            }
+
+            async function generateImage(prompt) {
+                const imageKey = state.settings.imageApiKey || state.settings.apiKey;
+                if (!imageKey) {
+                    showToast('Set an image API key in Settings.');
+                    openSettings();
+                    return;
+                }
+
+                const conv = ensureConversation();
+                conv.messages.push({ role: 'user', content: `Image: ${prompt}`, timestamp: Date.now() });
+                conv.updatedAt = Date.now();
+                saveConversations();
+                renderAll();
+
+                const aiIdx = conv.messages.length;
+                conv.messages.push({ role: 'assistant', content: '', imageDataUrl: '', timestamp: Date.now() });
+                saveConversations();
+                renderAll();
+
+                const aiRow = document.querySelector(`.message-row[data-index="${aiIdx}"]`);
+                const aiBubble = aiRow?.querySelector('.message-bubble');
+                if (aiBubble) {
+                    aiRow.querySelector('.message-actions')?.remove();
+                    aiBubble.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+                }
+                scrollToBottom();
+                state.isGenerating = true;
+                updateSendStopButtons();
+
+                try {
+                    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${encodeURIComponent(imageKey)}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                            generationConfig: { responseModalities: ['TEXT', 'IMAGE'] }
+                        }),
+                        signal: state.abortController?.signal
+                    });
+
+                    const data = await resp.json();
+                    if (!resp.ok) {
+                        conv.messages[aiIdx].content = 'Image generation failed: ' + (data.error?.message || resp.statusText || 'Unknown error');
+                        saveConversations();
+                        renderChat();
+                        return;
+                    }
+
+                    const parts = data.candidates?.[0]?.content?.parts || [];
+                    let text = '';
+                    let imageDataUrl = '';
+                    parts.forEach(part => {
+                        if (part.text) text += part.text;
+                        if (part.inlineData?.mimeType && part.inlineData?.data) {
+                            imageDataUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                        }
+                    });
+
+                    conv.messages[aiIdx].content = text || 'Image generated.';
+                    conv.messages[aiIdx].imageDataUrl = imageDataUrl;
+                    conv.updatedAt = Date.now();
+                    saveConversations();
+                    renderChat();
+                } catch (err) {
+                    conv.messages[aiIdx].content = 'Image generation error: ' + err.message;
+                    saveConversations();
+                    renderChat();
+                } finally {
+                    state.isGenerating = false;
+                    updateSendStopButtons();
+                    renderAll();
+                    closeSidebarMobile();
+                }
+            }
+
             async function sendMessage() {
                 if (state.isGenerating) return;
                 const input = document.getElementById('chatInput');
                 const content = input.value.trim();
                 if (!content) return;
+                const imagePrompt = parseImagePrompt(content);
+                if (imagePrompt) {
+                    await generateImage(imagePrompt);
+                    return;
+                }
                 if (content.toLowerCase().startsWith('search:')) {
                     const q = content.split(':').slice(1).join(':').trim();
                     if (!q) return;
@@ -1779,6 +1871,7 @@
                 document.getElementById('topPValue').textContent = state.settings.topP;
                 document.getElementById('settingSystemPrompt').value = state.settings.systemPrompt;
                 document.getElementById('settingStreaming').checked = state.settings.streaming;
+                document.getElementById('settingImageApiKey').value = state.settings.imageApiKey || '';
                 document.getElementById('settingTheme').checked = state.settings.theme === 'light';
                 document.getElementById('settingsModal').classList.remove('hidden');
             }
@@ -1795,6 +1888,7 @@
                 state.settings.topP = parseFloat(document.getElementById('settingTopP').value);
                 state.settings.systemPrompt = document.getElementById('settingSystemPrompt').value.trim();
                 state.settings.streaming = document.getElementById('settingStreaming').checked;
+                state.settings.imageApiKey = document.getElementById('settingImageApiKey').value.trim();
                 saveState();
                 closeSettings();
                 applyTheme();
