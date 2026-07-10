@@ -56,13 +56,13 @@
           <form
             class="contact-form"
             id="contact-form"
-            action="https://formsubmit.co/hsalberts321@gmail.com"
-            data-ajax-endpoint="https://formsubmit.co/ajax/hsalberts321@gmail.com"
+            action="https://formspree.io/f/xpqgvnln"
+            data-ajax-endpoint="https://formspree.io/f/xpqgvnln"
             method="POST"
           >
-            <input type="hidden" name="_subject" value="New contact form message from Henrys Website">
-            <input type="hidden" name="_template" value="table">
-            <input class="honey-field" type="text" name="_honey" tabindex="-1" autocomplete="off">
+            
+            
+            
 
             <div class="field-group">
               <label class="visually-hidden" for="contact-name">Name</label>
@@ -85,9 +85,10 @@
             </div>
 
             
-            <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+            <div data-fs-success class="form-status success">Your message was sent successfully. I will reply to the email address you entered.</div>
+            <div data-fs-error class="form-status error">The form could not send right now. Please try again or email me directly at hsalberts321@gmail.com.</div>
 
-            <button class="contact-submit" type="submit">Send</button>
+            <button class="contact-submit" type="submit" data-fs-submit-btn>Send</button>
           </form>
         </div>
 
@@ -181,55 +182,31 @@
         setStatus("");
       });
 
-      contactForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        setStatus("");
-
+      contactForm.addEventListener("submit", (event) => {
         [nameField, emailField, subjectField, messageField].forEach((field) => {
           field.value = field.value.trim();
         });
 
         if (!contactForm.reportValidity()) {
+          event.preventDefault();
           return;
         }
-
-        submitButton.disabled = true;
-        submitButton.textContent = "Sending...";
-
-        const formData = new FormData(contactForm);
-        formData.set("_replyto", emailField.value);
-
-        try {
-          const response = await fetch(contactForm.dataset.ajaxEndpoint, {
-            method: "POST",
-            body: formData,
-            headers: {
-              Accept: "application/json"
-            }
-          });
-
-          const data = await response.json().catch(() => ({}));
-
-          if (!response.ok || data.success === false) {
-            throw new Error("Request failed");
-          }
-
-          contactForm.reset();
-          setStatus("Your message was sent successfully. I will reply to the email address you entered.", "success");
-        } catch (error) {
-          setStatus("The form could not send right now. Please email me directly at hsalberts321@gmail.com.", "error");
-        } finally {
-          submitButton.disabled = false;
-          submitButton.textContent = "Send";
-        }
       });
-    }
-  </script>
+    </script>
   <footer class="page-copyright">
     <p>© 2026-2027 Henry S Alberts. All rights reserved</p>
   </footer>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
 
 
 
