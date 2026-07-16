@@ -174,6 +174,20 @@ def run_tool(name: str, args: dict, cwd: str) -> tuple[str, str | None]:
     return f"Unknown tool: {name}", None
 
 
+MAX_HISTORY = 16  # keep last N messages to avoid hitting token limits
+
+
+def trim_messages(messages: list) -> list:
+    """Keep the last MAX_HISTORY messages, but never cut in the middle of a tool call pair."""
+    if len(messages) <= MAX_HISTORY:
+        return messages
+    trimmed = messages[-MAX_HISTORY:]
+    # If the first message is a tool result, drop it (orphaned without its tool_call)
+    while trimmed and trimmed[0].get("role") == "tool":
+        trimmed = trimmed[1:]
+    return trimmed
+
+
 async def agent_loop(ws, client, model: str, messages: list, cwd: str, system: str) -> str:
     """Run the agentic loop, streaming text to the websocket. Returns final cwd."""
 
@@ -186,7 +200,7 @@ async def agent_loop(ws, client, model: str, messages: list, cwd: str, system: s
         try:
             stream = await client.chat.completions.create(
                 model=model,
-                messages=[{"role": "system", "content": system}] + messages,
+                messages=[{"role": "system", "content": system}] + trim_messages(messages),
                 tools=TOOLS,
                 tool_choice="auto",
                 max_tokens=8192,
@@ -217,10 +231,11 @@ async def agent_loop(ws, client, model: str, messages: list, cwd: str, system: s
                             tool_calls_buf[idx]["args"] += tc.function.arguments
 
         except groq_lib.APIStatusError as e:
-            await ws.send(json.dumps({
-                "type": "error",
-                "message": f"Groq API error {e.status_code}: {e.message}"
-            }))
+            if e.status_code == 413:
+                msg = "Context too large for this model. Switch to 'Llama 3.3 70B' or tap Clear Chat and try again."
+            else:
+                msg = f"Groq API error {e.status_code}: {e.message}"
+            await ws.send(json.dumps({"type": "error", "message": msg}))
             return cwd
         except groq_lib.APIConnectionError:
             await ws.send(json.dumps({
