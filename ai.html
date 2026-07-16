@@ -1174,6 +1174,10 @@
                 <input type="password" id="settingApiKey" placeholder="gsk_..." autocomplete="off">
             </div>
             <div class="form-group">
+                <label>Anthropic API Key (for Claude models)</label>
+                <input type="password" id="settingAnthropicApiKey" placeholder="sk-ant-..." autocomplete="off">
+            </div>
+            <div class="form-group">
                 <label>Image API Key (optional)</label>
                 <input type="password" id="settingImageApiKey" placeholder="Hugging Face key" autocomplete="off">
             </div>
@@ -1185,6 +1189,9 @@
                     <option value="openai/gpt-oss-20b">
                     <option value="llama-3.3-70b-versatile">
                     <option value="llama-3.1-8b-instant">
+                    <option value="claude-opus-4-8">
+                    <option value="claude-sonnet-5">
+                    <option value="claude-haiku-4-5-20251001">
                 </datalist>
             </div>
             <div class="form-group">
@@ -1235,6 +1242,7 @@
                 tokensGenerated: 0,
                 settings: {
                     apiKey: '',
+                    anthropicApiKey: '',
                     imageApiKey: '',
                     model: 'openai/gpt-oss-120b',
                     temperature: 0.7,
@@ -1251,11 +1259,16 @@
             function normalizeModel(model) {
                 const value = (model || '').trim();
                 if (!value) return 'openai/gpt-oss-120b';
+                if (value.toLowerCase().startsWith('claude-')) return value;
                 if (value.toLowerCase().startsWith('openai/')) return value;
                 if (value.toLowerCase() === 'gpt-oss-120b' || value.toLowerCase() === 'gpt-oss-20b') {
                     return `openai/${value}`;
                 }
                 return value;
+            }
+
+            function isAnthropicModel(model) {
+                return (model || '').toLowerCase().startsWith('claude-');
             }
 
             function getErrorMessage(resp, fallbackText) {
@@ -1622,7 +1635,12 @@
                     renderAll();
                     return;
                 }
-                if (!state.settings.apiKey) {
+                if (isAnthropicModel(state.settings.model)) {
+                    if (!state.settings.anthropicApiKey) {
+                        showToast('Set Anthropic API key in Settings.');
+                        openSettings(); return;
+                    }
+                } else if (!state.settings.apiKey) {
                     showToast('Set API key in Settings.');
                     openSettings(); return;
                 }
@@ -1655,24 +1673,49 @@
                 const msgs = [];
                 if (state.settings.systemPrompt) msgs.push({ role: 'system', content: state.settings.systemPrompt });
                 conv.messages.slice(0, -1).forEach(m => msgs.push({ role: m.role, content: m.content }));
-                const body = {
-                    model: normalizeModel(state.settings.model),
-                    messages: msgs,
-                    temperature: parseFloat(state.settings.temperature),
-                    max_tokens: parseInt(state.settings.maxTokens),
-                    top_p: parseFloat(state.settings.topP),
-                    stream: state.settings.streaming
-                };
                 try {
-                    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${state.settings.apiKey}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(body),
-                        signal: state.abortController.signal
-                    });
+                    const useAnthropic = isAnthropicModel(state.settings.model);
+                    let resp;
+                    if (useAnthropic) {
+                        const anthropicMsgs = msgs.filter(m => m.role !== 'system');
+                        const anthropicBody = {
+                            model: state.settings.model,
+                            max_tokens: parseInt(state.settings.maxTokens) || 2048,
+                            messages: anthropicMsgs,
+                            stream: state.settings.streaming
+                        };
+                        const sysMsg = msgs.find(m => m.role === 'system');
+                        if (sysMsg) anthropicBody.system = sysMsg.content;
+                        resp = await fetch('https://api.anthropic.com/v1/messages', {
+                            method: 'POST',
+                            headers: {
+                                'x-api-key': state.settings.anthropicApiKey,
+                                'anthropic-version': '2023-06-01',
+                                'anthropic-dangerous-direct-browser-access': 'true',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(anthropicBody),
+                            signal: state.abortController.signal
+                        });
+                    } else {
+                        const body = {
+                            model: normalizeModel(state.settings.model),
+                            messages: msgs,
+                            temperature: parseFloat(state.settings.temperature),
+                            max_tokens: parseInt(state.settings.maxTokens),
+                            top_p: parseFloat(state.settings.topP),
+                            stream: state.settings.streaming
+                        };
+                        resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${state.settings.apiKey}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(body),
+                            signal: state.abortController.signal
+                        });
+                    }
                     if (!resp.ok) {
                         const errorText = await getErrorMessage(resp, resp.statusText || 'Unknown error');
                         conv.messages[aiIdx].content = 'Error: ' + errorText;
@@ -1693,11 +1736,18 @@
                             for (let i = 0; i < lines.length - 1; i++) {
                                 const line = lines[i].trim();
                                 if (!line || !line.startsWith('data:')) continue;
-                                const jsonStr = line.substring(6).trim();
+                                const jsonStr = line.substring(5).trim();
                                 if (jsonStr === '[DONE]') break;
                                 try {
                                     const chunk = JSON.parse(jsonStr);
-                                    const delta = chunk.choices[0]?.delta?.content || '';
+                                    let delta = '';
+                                    if (useAnthropic) {
+                                        if (chunk.type === 'content_block_delta' && chunk.delta?.type === 'text_delta') {
+                                            delta = chunk.delta.text || '';
+                                        }
+                                    } else {
+                                        delta = chunk.choices?.[0]?.delta?.content || '';
+                                    }
                                     if (delta) {
                                         conv.messages[aiIdx].content += delta;
                                         state.tokensGenerated++;
@@ -1709,7 +1759,11 @@
                         }
                     } else {
                         const data = await resp.json();
-                        conv.messages[aiIdx].content = data.choices[0]?.message?.content || 'No response';
+                        if (useAnthropic) {
+                            conv.messages[aiIdx].content = data.content?.[0]?.text || 'No response';
+                        } else {
+                            conv.messages[aiIdx].content = data.choices?.[0]?.message?.content || 'No response';
+                        }
                         if (aiBubble) aiBubble.innerHTML = renderMarkdown(conv.messages[aiIdx].content);
                     }
                     conv.updatedAt = Date.now();
@@ -1863,6 +1917,7 @@
 
             function openSettings() {
                 document.getElementById('settingApiKey').value = state.settings.apiKey;
+                document.getElementById('settingAnthropicApiKey').value = state.settings.anthropicApiKey || '';
                 document.getElementById('settingModel').value = state.settings.model;
                 document.getElementById('settingTemperature').value = state.settings.temperature;
                 document.getElementById('tempValue').textContent = state.settings.temperature;
@@ -1882,6 +1937,7 @@
 
             function saveSettings() {
                 state.settings.apiKey = document.getElementById('settingApiKey').value.trim();
+                state.settings.anthropicApiKey = document.getElementById('settingAnthropicApiKey').value.trim();
                 state.settings.model = normalizeModel(document.getElementById('settingModel').value) || 'openai/gpt-oss-120b';
                 state.settings.temperature = parseFloat(document.getElementById('settingTemperature').value);
                 state.settings.maxTokens = parseInt(document.getElementById('settingMaxTokens').value);
